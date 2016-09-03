@@ -1,9 +1,8 @@
 This is a pretty basic outline for a slack bot that takes DMs and posts them
 anonymously in a different channel.
 
-It requires 4 environment variables be set up,  
+It requires 3 environment variables be set up,  
 BOT_ID (the user ID hash that slack makes for all users)
-BOT_DM (the channel ID hash slack has for the bot's direct message channel)
 ANON_CHANNEL (The channel id hash for the channel that the anonymous messages
    are supposed to be sent to)
 and SLACK_BOT_TOKEN (the api token for the slack team)
