@@ -22,7 +22,7 @@ def anon_message(message, user):
         line up under the same name.
     """
     hashed_user = hashlib.sha1(SALT + str(user))
-    new_message = "User" + hashed_user + ": " + message
+    new_message = "User" + hashed_user.hexdigest() + ": " + message
     slack_client.api_call("chat.postMessage", channel=ANON_CHANNEL,
                           text=new_message)
 
