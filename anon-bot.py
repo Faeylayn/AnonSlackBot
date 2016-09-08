@@ -1,5 +1,6 @@
 import os
 import time
+import hashlib
 from slackclient import SlackClient
 
 # starterbot's ID as an environment variable
@@ -9,6 +10,7 @@ BOT_ID = "U280RFSCB"
 # constants
 # BOT_DM = os.environ.get("BOT_DM")
 BOT_DM = "D28269FUG"
+SALT = "1234abcd."
 
 # ANON_CHANNEL = os.environ.get("ANON_CHANNEL")
 ANON_CHANNEL = 'C280R4B0T'
@@ -19,9 +21,11 @@ slack_client = SlackClient('xoxb-76025536419-kXoQ5HjaeX3hEzedIZicBJlY')
 
 
 
-def anon_message(message):
+def anon_message(message, user):
+    hashed_user = hashlib.sha1(SALT + str(user))
+    new_message = "User" + hashed_user + ": " + message
     slack_client.api_call("chat.postMessage", channel=ANON_CHANNEL,
-                          text=message)
+                          text=new_message)
 
 
 def parse_slack_output(slack_rtm_output):
@@ -36,7 +40,6 @@ def parse_slack_output(slack_rtm_output):
             # if output and 'channel' in output and BOT_DM in output['channel'] and 'text' in output:
             if output and 'channel' in output and 'text' in output:
                 # return text after the @ mention, whitespace removed
-                print output['channel']
                 if output['channel'][0] == "D":
                     # api_call = slack_client.api_call("channels.info", channel=output['channel'])
                     # print "hi"
@@ -44,17 +47,18 @@ def parse_slack_output(slack_rtm_output):
                     # if api_call.get("ok"):
                     # # if api_call.get('ok') and BOT_ID in api_call.get("channel").get('members'):
                     #     print api_call.get("channel")
-                    return output['text']
-    return None
+                    print output['user']
+                    return output['text'], output['user']
+    return None, None
 
 
 if __name__ == "__main__":
     READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
     if slack_client.rtm_connect():
         while True:
-            message = parse_slack_output(slack_client.rtm_read())
-            if message:
-                anon_message(message)
+            message, user = parse_slack_output(slack_client.rtm_read())
+            if message and user:
+                anon_message(message, user)
             time.sleep(READ_WEBSOCKET_DELAY)
     else:
         print("Connection failed. Invalid Slack token or bot ID?")
