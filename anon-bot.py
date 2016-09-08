@@ -23,7 +23,7 @@ slack_client = SlackClient('xoxb-76025536419-kXoQ5HjaeX3hEzedIZicBJlY')
 
 def anon_message(message, user):
     hashed_user = hashlib.sha1(SALT + str(user))
-    new_message = "User" + hashed_user + ": " + message
+    new_message = "User" + hashed_user.hexdigest() + ": " + message
     slack_client.api_call("chat.postMessage", channel=ANON_CHANNEL,
                           text=new_message)
 
